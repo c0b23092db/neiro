@@ -2,9 +2,9 @@
 
 This README-en.md was translated from README.md by Claude Sonnet 4.
 
-[English](README-en.md)・[日本語](../README.md)
+[日本語](../README.md)・[English](README-en.md)
 ```batch
-.\sap.exe
+sap.exe
 ```
 (*'▽')＜ A simple audio player that runs in the terminal.
 
@@ -20,6 +20,7 @@ This README-en.md was translated from README.md by Claude Sonnet 4.
 ## ⬇Installation⬇
 
 ### Binary
+- Windows : [sap.exe](https://github.com/c0b23092db/neiro/releases/download/0.2.0/sap.exe)
 - Windows : [sap.zip](https://github.com/c0b23092db/neiro/releases/download/0.2.0/sap-v0.2.0-x86_64-pc-windows-msvc.zip)
 
 ### cargo

@@ -1,7 +1,7 @@
 # <span style="color:#A0ffff">Neiro （ねゐろ）</span>
-[日本語](README.md)・[英語](./README/README-en.md)
+[日本語](README.md)・[English](./README/README-en.md)
 ```batch
-.\sap.exe
+sap.exe
 ```
 (*'▽')＜ターミナル上で動作するシンプルなオーディオプレイヤーです。
 
@@ -17,7 +17,8 @@
 ## ⬇インストール⬇
 
 ### バイナリ
-- Windows : [sap.exe](https://github.com/c0b23092db/neiro/releases/download/0.2.0/sap-v0.2.0-x86_64-pc-windows-msvc.zip)
+- Windows : [sap.exe](https://github.com/c0b23092db/neiro/releases/download/0.2.0/sap.exe)
+- Windows : [sap.zip](https://github.com/c0b23092db/neiro/releases/download/0.2.0/sap-v0.2.0-x86_64-pc-windows-msvc.zip)
 
 ### cargo
 ```batch
@@ -46,9 +47,11 @@ Arguments:
 > sap.exe audio.mp3
 .\audio.mp3 | 2:42 | 2:42
 ```
-コマンドラインで実行するモードです。  
-再生を停止するときは`Ctrl + C`を使用してください。  
-オプションと書かれている引数は`-v`や`-h`などを追加して使用します。  
+コマンドラインで実行するモードです。
+
+再生を停止するときは`Ctrl + C`を使用してください。
+
+オプションと書かれている引数は`-v`や`-h`などを追加して使用します。
 
 - Timer（オプション）
   　曲の再生時間を指定する。
@@ -69,7 +72,8 @@ Arguments:
 ```batch
 sap -i audio.mp3
 ```
-TUI上で再生するモードです。  
+TUI上で再生するモードです。
+
 受け付けるオプションはvolumeのみです。
 
 - Volume（オプション）
