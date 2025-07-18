@@ -4,7 +4,8 @@
 .\sap.exe
 ```
 (*'▽')＜ターミナル上で動作するシンプルなオーディオプレイヤーです。
-![Demo Movie](.\document\demo\demo_movie.mp4)
+
+![Demo Movie](https://github.com/c0b23092db/neiro/blob/master/document/demo/demo_movie.mp4)
 
 ## ❄概要❄
 - ターミナル上で動作するシンプルなオーディオプレイヤー
@@ -16,7 +17,7 @@
 ## ⬇インストール⬇
 
 ### バイナリ
-- Windows : ～～～
+- Windows : [sap.exe](https://github.com/c0b23092db/neiro/releases/download/0.2.0/sap-v0.2.0-x86_64-pc-windows-msvc.zip)
 
 ### cargo
 ```batch
@@ -45,9 +46,9 @@ Arguments:
 > sap.exe audio.mp3
 .\audio.mp3 | 2:42 | 2:42
 ```
-コマンドラインで実行するモードです。
-再生を停止するときは`Ctrl + C`を使用してください。
-オプションと書かれている引数は`-v`や`-h`などを追加して使用します。
+コマンドラインで実行するモードです。  
+再生を停止するときは`Ctrl + C`を使用してください。  
+オプションと書かれている引数は`-v`や`-h`などを追加して使用します。  
 
 - Timer（オプション）
   　曲の再生時間を指定する。
@@ -68,7 +69,7 @@ Arguments:
 ```batch
 sap -i audio.mp3
 ```
-TUI上で再生するモードです。
+TUI上で再生するモードです。  
 受け付けるオプションはvolumeのみです。
 
 - Volume（オプション）
@@ -106,7 +107,7 @@ sap stop
 - [ ] 非同期再生モード
 
 ## 🔍開発者🔎
-- いかた゚ : [](url)
+- いかた゚ ： [](url)
 
 ## ♪開発に使用した音源♪
 - [Amethyst break1](https://minecraft.fandom.com/wiki/Category:Amethyst_sounds)
@@ -114,4 +115,4 @@ sap stop
 - [4小節ごとにジャンルが変わるUnwelcome School.Remix](https://booth.pm/ja/items/6307718)
 
 ## 📄ライセンス📝
-[MIT Licence](./LICENCE.md) / <http://opensource.org/licenses/MIT>
+[MIT Licence](https://github.com/c0b23092db/neiro/blob/master/LICENSE.md) / <http://opensource.org/licenses/MIT>
