@@ -22,6 +22,14 @@ sap.exe
 
 ### cargo
 ```batch
+cargo install Neiro
+```
+
+```batch
+cargo binstall Neiro
+```
+
+```batch
 cargo install --locked --git https://github.com/c0b23092db/neiro
 ```
 
