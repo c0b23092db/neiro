@@ -1,0 +1,8 @@
+/target
+/binary
+
+# ドキュメント #
+/document/sound
+
+# デバッグ #
+/old_code
