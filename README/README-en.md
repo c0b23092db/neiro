@@ -8,7 +8,7 @@ This README-en.md was translated from README.md by Claude Sonnet 4.
 ```
 (*'▽')＜ A simple audio player that runs in the terminal.
 
-![Demo Movie](./document/demo/demo_movie.mp4)
+![Demo Movie](../document/demo/sap_demo_movie.gif)
 
 ## ❄Overview❄
 - A simple audio player that runs in the terminal
