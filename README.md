@@ -5,7 +5,7 @@
 ```
 (*'▽')＜ターミナル上で動作するシンプルなオーディオプレイヤーです。
 
-![Demo Movie](./document/demo/demo_movie.mp4)
+![Demo Movie](./document/demo/sap_demo_movie.gif)
 
 ## ❄概要❄
 - ターミナル上で動作するシンプルなオーディオプレイヤー
