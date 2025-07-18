@@ -1,11 +1,11 @@
 # <span style="color:#A0ffff">Neiro （ねゐろ）</span>
-[日本語](README.md)・[英語](README\README-en.md)
+[日本語](README.md)・[英語](./README/README-en.md)
 ```batch
 .\sap.exe
 ```
 (*'▽')＜ターミナル上で動作するシンプルなオーディオプレイヤーです。
 
-![Demo Movie](https://github.com/c0b23092db/neiro/blob/master/document/demo/demo_movie.mp4)
+![Demo Movie](./document/demo/demo_movie.mp4)
 
 ## ❄概要❄
 - ターミナル上で動作するシンプルなオーディオプレイヤー
@@ -115,4 +115,4 @@ sap stop
 - [4小節ごとにジャンルが変わるUnwelcome School.Remix](https://booth.pm/ja/items/6307718)
 
 ## 📄ライセンス📝
-[MIT Licence](https://github.com/c0b23092db/neiro/blob/master/LICENSE.md) / <http://opensource.org/licenses/MIT>
+[MIT Licence](./LICENSE.md) / <http://opensource.org/licenses/MIT>
