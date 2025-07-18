@@ -20,7 +20,7 @@ This README-en.md was translated from README.md by Claude Sonnet 4.
 ## ⬇Installation⬇
 
 ### Binary
-- Windows : ～～～
+- Windows : [sap.zip](https://github.com/c0b23092db/neiro/releases/download/0.2.0/sap-v0.2.0-x86_64-pc-windows-msvc.zip)
 
 ### cargo
 ```batch
