@@ -7,7 +7,8 @@ This README-en.md was translated from README.md by Claude Sonnet 4.
 .\sap.exe
 ```
 (*'▽')＜ A simple audio player that runs in the terminal.
-![Demo Movie](.\document\demo\demo_movie.mp4)
+
+![Demo Movie](./document/demo/demo_movie.mp4)
 
 ## ❄Overview❄
 - A simple audio player that runs in the terminal
@@ -117,4 +118,4 @@ sap stop
 - [4小節ごとにジャンルが変わるUnwelcome School.Remix](https://booth.pm/ja/items/6307718)
 
 ## 📄License📝
-[MIT Licence](./LICENCE.md) / <http://opensource.org/licenses/MIT>
+[MIT Licence](../LICENSE.md) / <http://opensource.org/licenses/MIT>
