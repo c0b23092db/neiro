@@ -1,6 +1,6 @@
 [package]
 name = "Neiro"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "Simple Audio File Player in Terminal"
 authors = ["IKATA゚ <>"]
@@ -18,9 +18,14 @@ codegen-units = 1
 strip = "symbols"
 
 [dependencies]
-clap = { version = "4.5.41", features = ["derive"] }
-crossterm = "0.28.1"
-ratatui = "0.29.0"
-rodio = "0.21.1"
-smol = "2.0.2"
+# エラー処理
 anyhow = "1.0.98"
+# 並列処理
+smol = "2.0.2"
+# 引数
+clap = { version = "4.5.41", features = ["derive"] }
+# 音声処理
+rodio = "0.21.1"
+# TUI
+crossterm = "0.29.0"
+ratatui = "0.29.0"

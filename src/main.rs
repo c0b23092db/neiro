@@ -7,7 +7,7 @@ use clap::Parser;
 #[derive(Debug,Parser)]
 #[command(author,version,about,arg_required_else_help = true)]
 #[clap(
-long_about = "NeiroKiku / Simple Audio File Player"
+long_about = "Neiro / Simple Audio File Player"
 )]
 struct Cli {
     #[clap(
@@ -24,7 +24,7 @@ struct Cli {
     )]
     timer:u64,
     #[clap(
-        help = "Volume of Audio file [0-100]",
+        help = "Volume of Audio file [0-200]",
         long = "volume",
         short = 'v',
         default_value_t = 50,
