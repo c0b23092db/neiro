@@ -7,6 +7,7 @@ use std::time::Duration;
 
 pub struct App {
     pub player: InteractivePlayer,
+    // files_list:Vec<String>, // 実装予定
     exit: bool,
 }
 
@@ -14,6 +15,7 @@ impl Default for App {
     fn default() -> Self {
         Self {
             player: InteractivePlayer::new().unwrap(),
+            // files_list:Vec::new(),
             exit: false,
         }
     }
@@ -30,22 +32,22 @@ impl App {
         self.player.insert_and_play(&file_name)?;
         smol::block_on(async {
             while !self.exit {
-                self.player.check_time_update();
+                self.player.update_current_time();
                 terminal.draw(|frame| draw(frame, &self, &self.player))?;
                 if let Err(e) = self.handle_events_async().await {
                     return Err(e);
                 }
+                smol::Timer::after(Duration::from_millis(16)).await;
                 if self.player.is_empty() && self.player.is_playing() {
                     self.exit = true;
                 }
-                smol::Timer::after(Duration::from_millis(16)).await;
             }
             Ok(())
         })
     }
 
     async fn handle_events_async(&mut self) -> Result<()> {
-        if event::poll(Duration::from_millis(0))? {
+        if event::poll(Duration::ZERO)? {
             match event::read()? {
                 Event::Key(input) if input.kind == KeyEventKind::Press => {
                     self.handle_key_event(input)?;
@@ -73,16 +75,16 @@ impl App {
             },
             // 再生位置を変更 //
             (modifier, key @ (KeyCode::Left | KeyCode::Right)) => {
-                let plus_or_minus = matches!(key, KeyCode::Right);
-                let duration = if modifier == KeyModifiers::SHIFT { 10 } else { 5 };
-                self.seek(Duration::from_secs(duration), plus_or_minus)?
+                let mut secs = if modifier == KeyModifiers::SHIFT { 10 } else { 5 };
+                secs *= if matches!(key, KeyCode::Right) { 1 } else { -1 };
+                self.seek(secs)?
             },
             // 参考コード // 10秒進む //
             // (KeyModifiers::SHIFT, KeyCode::Right) => self.seek(Duration::from_secs(10), true)?,
             // 参考コード // 5秒進む //
             // (_, KeyCode::Right) => self.seek(Duration::from_secs(5), true)?,
             // リプレイ //
-            (_, KeyCode::Char('r')) => self.player.seek(Duration::from_secs(0))?,
+            (_, KeyCode::Char('r')) => self.player.sink.try_seek(Duration::ZERO).unwrap(),
             // 取り出し //
             (_, KeyCode::Char('s')) => self.player.stop(),
             _ => {}
@@ -100,21 +102,8 @@ impl App {
         Ok(())
     }
 
-    fn seek(&mut self, duration:Duration, plus_or_minus:bool) -> Result<()> {
-        if plus_or_minus{
-            if self.player.duration_total_time < self.player.duration_current_time + duration {
-                self.player.seek(self.player.duration_total_time)?
-            }else{
-                self.player.seek(self.player.duration_current_time + duration)?
-            }
-        }else{
-            if self.player.duration_current_time.as_secs() < 5 {
-                self.player.seek(Duration::from_secs(0))?
-            }else{
-                self.player.seek(self.player.duration_current_time - duration)?
-            }
-        }
-        Ok(())
+    fn seek(&mut self, secs:i64) -> Result<()> {
+        Ok(self.player.seek(secs)?)
     }
 
     fn exit(&mut self) {

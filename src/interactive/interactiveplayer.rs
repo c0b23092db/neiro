@@ -1,5 +1,6 @@
 use crate::core::player;
 use std::time::Duration;
+use std::path::Path;
 use rodio::{OutputStream, Sink};
 use anyhow::{Result, anyhow};
 use smol::channel::{unbounded, Receiver, Sender};
@@ -8,6 +9,7 @@ use std::sync::{Arc, Mutex};
 pub struct InteractivePlayer {
     pub sink: Sink,
     _stream_handle: OutputStream,
+    pub file_path: String,
     pub file_name: String,
     pub volume: u8,
     pub duration_total_time: Duration,
@@ -27,12 +29,13 @@ impl InteractivePlayer {
         Ok(Self {
             sink,
             _stream_handle,
+            file_path: "".to_string(),
             file_name: "".to_string(),
             volume: 50,
-            duration_total_time: Duration::from_secs(0),
-            total_time: player::format_duration(Duration::from_secs(0)),
-            duration_current_time: Duration::from_secs(0),
-            current_time: player::format_duration(Duration::from_secs(0)),
+            duration_total_time: Duration::ZERO,
+            total_time: player::format_duration(Duration::ZERO),
+            duration_current_time: Duration::ZERO,
+            current_time: player::format_duration(Duration::ZERO),
             time_update_sender,
             time_update_receiver,
             time_update_stop,
@@ -46,11 +49,12 @@ impl InteractivePlayer {
     }
 
     pub fn insert(&mut self, file_name: &str) -> Result<()> {
-        self.file_name = file_name.to_string();
-        let path = player::check_and_get_path(&self.file_name)?;
+        self.file_path = file_name.to_string();
+        self.file_name = Path::new(file_name).file_name().unwrap().to_string_lossy().into_owned();
+        let path = player::check_and_get_path(&self.file_path)?;
         self.duration_total_time = player::append_one_track(&self.sink, path)?;
         self.total_time = player::format_duration(self.duration_total_time);
-        self.start_time_update_task();
+        self.start_task_update_time();
         Ok(())
     }
 
@@ -79,9 +83,22 @@ impl InteractivePlayer {
         }
     }
 
-    pub fn seek(&self, secs: Duration) -> Result<()> {
+    pub fn seek(&self, secs:i64) -> Result<()> {
+        let duration_seconds = if secs.is_negative() {
+            if self.duration_current_time.as_secs() < secs.unsigned_abs(){
+                Duration::ZERO
+            }else{
+                self.duration_current_time - Duration::from_secs(secs.unsigned_abs())
+            }
+        } else {
+            if self.duration_total_time.as_secs() < secs.unsigned_abs() + self.duration_current_time.as_secs() {
+                self.duration_total_time
+            }else{
+                self.duration_current_time + Duration::from_secs(secs.unsigned_abs())
+            }
+        };
         self.sink
-            .try_seek(secs)
+            .try_seek(duration_seconds)
             .map_err(|e| anyhow!("Failed to seek in rodio：{}", e))?;
         Ok(())
     }
@@ -91,7 +108,7 @@ impl InteractivePlayer {
         self.sink.set_volume(volume as f32 / 100.0);
     }
 
-    pub fn update_current_position(&mut self) {
+    pub fn get_current_position(&mut self) {
         self.duration_current_time = self.sink.get_pos();
         self.current_time = player::format_duration(self.duration_current_time);
     }
@@ -108,7 +125,7 @@ impl InteractivePlayer {
         return self.sink.empty();
     }
 
-    fn start_time_update_task(&self) {
+    fn start_task_update_time(&self) {
         let sender = self.time_update_sender.clone();
         let stop_update = self.time_update_stop.clone();
         smol::spawn(async move {
@@ -121,17 +138,14 @@ impl InteractivePlayer {
                 if sender.send(()).await.is_err() {
                     break;
                 }
-                smol::Timer::after(Duration::from_millis(100)).await;
+                smol::Timer::after(Duration::from_millis(1)).await;
             }
         }).detach();
     }
 
-    pub fn check_time_update(&mut self) -> bool {
+    pub fn update_current_time(&mut self) {
         if let Ok(()) = self.time_update_receiver.try_recv() {
-            self.update_current_position();
-            true
-        } else {
-            false
+            self.get_current_position();
         }
     }
 }
