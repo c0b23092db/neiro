@@ -18,7 +18,7 @@ sap.exe
 
 ### バイナリ
 - Windows : [sap.exe](https://github.com/c0b23092db/neiro/releases/download/0.2.1/sap.exe)
-- Windows : [sap.zip](https://github.com/c0b23092db/neiro/releases/download/0.2.1/sap-v0.2.0-x86_64-pc-windows-msvc.zip)
+- Windows : [sap.zip](https://github.com/c0b23092db/neiro/releases/download/0.2.1/sap-v0.2.1-x86_64-pc-windows-msvc.zip)
 
 ### cargo
 ```batch
