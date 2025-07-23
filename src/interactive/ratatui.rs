@@ -38,15 +38,13 @@ s : オーディオファイルの取り出し
 ↑ / ↓ / Shift + ↑ / Shift + ↓ : 音量の調整",)).centered();
     frame.render_widget(keybind, layout[1]);
     // 再生バー //
-    let progress_percentage = if 0 < player.duration_total_time.as_secs() {
-        ((player.duration_current_time.as_millis() as f64 / player.duration_total_time.as_millis() as f64) * 100.0) as u16
-    } else { 0 };
+    let progress_percentage = ((player.duration_current_time.as_millis() as f64 / player.duration_total_time.as_millis() as f64) * 100.0) as u16;
     let progress_gauge = Gauge::default()
         .label(format!("{}:{:02}:{:02}:{:03} / {}:{:02}:{:02}:{:03}",
                         player.current_time.0,player.current_time.1,player.current_time.2,player.current_time.3,
                         player.total_time.0,player.total_time.1,player.total_time.2, player.total_time.3,
         ))
-        .gauge_style(tailwind::BLUE.c500).percent(progress_percentage.clamp(0,100));
+        .gauge_style(tailwind::BLUE.c500).percent(progress_percentage);
     frame.render_widget(progress_gauge, layout[2]);
     // 再生ボタン //
     let play_button = Line::from(if player.is_playing() { "▶ Resume ▶" } else { "- Pause -" })
@@ -54,8 +52,8 @@ s : オーディオファイルの取り出し
     frame.render_widget(play_button, layout[3]);
     // 音量バー //
     let volume_gauge = Gauge::default()
+        .block(Block::bordered().title("音量"))
         .label(format!("{}%", player.volume))
-        .gauge_style(tailwind::GREEN.c500).percent(player.volume as u16)
-        .block(Block::bordered().title("音量"));
+        .gauge_style(tailwind::GREEN.c500).percent(player.volume as u16);
     frame.render_widget(volume_gauge, layout[4]);
 }
