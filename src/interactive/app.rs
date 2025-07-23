@@ -30,14 +30,15 @@ impl App {
         self.player = InteractivePlayer::new()?;
         self.player.set_volume(volume);
         self.player.insert_and_play(&file_name)?;
+        let framerate = Duration::from_millis(16); // 62.5HZ / 62.5FPS
         smol::block_on(async {
             while !self.exit {
                 self.player.update_current_time();
-                terminal.draw(|frame| draw(frame, &self, &self.player))?;
                 if let Err(e) = self.handle_events_async().await {
                     return Err(e);
                 }
-                smol::Timer::after(Duration::from_millis(16)).await;
+                terminal.draw(|frame| draw(frame, &self, &self.player))?;
+                smol::Timer::after(framerate).await;
                 if self.player.is_empty() && self.player.is_playing() {
                     self.exit = true;
                 }
@@ -65,7 +66,7 @@ impl App {
             // 終了 //
             (_, KeyCode::Esc | KeyCode::Char('q'))
             | (KeyModifiers::CONTROL, KeyCode::Char('c') | KeyCode::Char('C')) => self.exit(),
-            // 再生/一時停止 //
+            // 再生 / 一時停止 //
             (_, KeyCode::Char(' ')) => _ = self.player.switch_playback(),
             // 音量を変更 //
             (modifier, key @ (KeyCode::Up | KeyCode::Down)) => {
@@ -77,14 +78,13 @@ impl App {
             (modifier, key @ (KeyCode::Left | KeyCode::Right)) => {
                 let mut secs = if modifier == KeyModifiers::SHIFT { 10 } else { 5 };
                 secs *= if matches!(key, KeyCode::Right) { 1 } else { -1 };
-                self.seek(secs)?
+                self.player.skep_seek(secs)?
             },
-            // 参考コード // 10秒進む //
-            // (KeyModifiers::SHIFT, KeyCode::Right) => self.seek(Duration::from_secs(10), true)?,
-            // 参考コード // 5秒進む //
-            // (_, KeyCode::Right) => self.seek(Duration::from_secs(5), true)?,
+            // 参考コード // 5,10秒進む //
+            // (KeyModifiers::SHIFT, KeyCode::Right) => self.skep_seek(10)?,
+            // (_, KeyCode::Right) => self.skep_seek(5)?,
             // リプレイ //
-            (_, KeyCode::Char('r')) => self.player.sink.try_seek(Duration::ZERO).unwrap(),
+            (_, KeyCode::Char('r')) => self.player.jump_seek(u64::MIN)?,
             // 取り出し //
             (_, KeyCode::Char('s')) => self.player.stop(),
             _ => {}
@@ -100,10 +100,6 @@ impl App {
             self.player.set_volume((self.player.get_volume() * 100.0) as u8 - volume);
         }
         Ok(())
-    }
-
-    fn seek(&mut self, secs:i64) -> Result<()> {
-        Ok(self.player.seek(secs)?)
     }
 
     fn exit(&mut self) {

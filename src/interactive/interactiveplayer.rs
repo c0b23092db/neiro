@@ -21,6 +21,12 @@ pub struct InteractivePlayer {
     pub time_update_stop: Arc<Mutex<bool>>,
 }
 
+impl Drop for InteractivePlayer {
+    fn drop(&mut self) {
+        self.sink.stop();
+    }
+}
+
 impl InteractivePlayer {
     pub fn new() -> Result<Self> {
         let (_stream_handle, sink) = player::initialize_soundplayer()?;
@@ -83,23 +89,29 @@ impl InteractivePlayer {
         }
     }
 
-    pub fn seek(&self, secs:i64) -> Result<()> {
-        let duration_seconds = if secs.is_negative() {
-            if self.duration_current_time.as_secs() < secs.unsigned_abs(){
+    pub fn jump_seek(&self, secs:u64) -> Result<()> {
+        self.sink.try_seek(Duration::from_secs(secs))
+            .map_err(|e| anyhow!("Failed to jump_seek() used seek in rodio: {}", e))?;
+        Ok(())
+    }
+
+    pub fn skep_seek(&self, secs:i64) -> Result<()> {
+        let duration_secs = Duration::from_secs(secs.unsigned_abs());
+        let change_duration = if secs.is_negative() {
+            if self.duration_current_time < duration_secs{
                 Duration::ZERO
             }else{
-                self.duration_current_time - Duration::from_secs(secs.unsigned_abs())
+                self.duration_current_time - duration_secs
             }
         } else {
-            if self.duration_total_time.as_secs() < secs.unsigned_abs() + self.duration_current_time.as_secs() {
+            if self.duration_total_time < duration_secs + self.duration_current_time {
                 self.duration_total_time
             }else{
-                self.duration_current_time + Duration::from_secs(secs.unsigned_abs())
+                self.duration_current_time + duration_secs
             }
         };
-        self.sink
-            .try_seek(duration_seconds)
-            .map_err(|e| anyhow!("Failed to seek in rodio：{}", e))?;
+        self.sink.try_seek(change_duration)
+            .map_err(|e| anyhow!("Failed to skep_seek() used seek in rodio: {}", e))?;
         Ok(())
     }
 
