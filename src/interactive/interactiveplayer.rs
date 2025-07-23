@@ -142,13 +142,13 @@ impl InteractivePlayer {
         let stop_update = self.time_update_stop.clone();
         smol::spawn(async move {
             loop {
+                if sender.send(()).await.is_err() {
+                    break;
+                }
                 if let Ok(stop_flag) = stop_update.lock() {
                     if *stop_flag {
                         break;
                     }
-                }
-                if sender.send(()).await.is_err() {
-                    break;
                 }
                 smol::Timer::after(Duration::from_millis(1)).await;
             }

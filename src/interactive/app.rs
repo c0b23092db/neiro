@@ -8,6 +8,7 @@ use std::time::Duration;
 pub struct App {
     pub player: InteractivePlayer,
     // files_list:Vec<String>, // 実装予定
+    framerate: Duration,
     exit: bool,
 }
 
@@ -16,6 +17,7 @@ impl Default for App {
         Self {
             player: InteractivePlayer::new().unwrap(),
             // files_list:Vec::new(),
+            framerate: Duration::from_millis(16), // 62.5HZ / 62.5FPS
             exit: false,
         }
     }
@@ -23,14 +25,13 @@ impl Default for App {
 
 impl App {
     pub fn new() -> Self {
-        return App::default();
+            return App::default();
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal, file_name: &str, volume: u8) -> Result<()> {
         self.player = InteractivePlayer::new()?;
         self.player.set_volume(volume);
         self.player.insert_and_play(&file_name)?;
-        let framerate = Duration::from_millis(16); // 62.5HZ / 62.5FPS
         smol::block_on(async {
             while !self.exit {
                 self.player.update_current_time();
@@ -38,7 +39,7 @@ impl App {
                     return Err(e);
                 }
                 terminal.draw(|frame| draw(frame, &self, &self.player))?;
-                smol::Timer::after(framerate).await;
+                smol::Timer::after(self.framerate).await;
                 if self.player.is_empty() && self.player.is_playing() {
                     self.exit = true;
                 }
