@@ -13,7 +13,8 @@ pub fn one_play(file_name:&str, volume:u8, mut timer:u64) -> Result<()> {
         timer = duration.as_secs();
     }
     println!("{} | {}:{:02}:{:02} | {}:{:02}:{:02}",
-                file_path.file_name().unwrap().to_string_lossy().into_owned(), hours, minutes, seconds,
+                file_path.file_name().unwrap().to_string_lossy().into_owned(),
+                hours, minutes, seconds,
                 timer / 60 / 60, timer / 60 % 60, timer % 60);
     thread::sleep(Duration::from_secs(timer));
     Ok(())
