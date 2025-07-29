@@ -3,6 +3,7 @@ name = "Neiro"
 version = "0.2.1"
 edition = "2024"
 description = "Simple Audio File Player in Terminal"
+categories = ["command-line-utilities","multimedia::audio"]
 authors = ["IKATA゚ <>"]
 license = "MIT"
 repository = "https://github.com/c0b23092db/neiro"
@@ -19,7 +20,7 @@ strip = "symbols"
 
 [dependencies]
 # エラー処理
-anyhow = "1.0.98"
+anyhow = "1.0"
 # 並列処理
 smol = "2.0.2"
 # 引数
