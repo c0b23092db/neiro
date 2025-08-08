@@ -25,7 +25,7 @@ impl Default for App {
 
 impl App {
     pub fn new() -> Self {
-            return App::default();
+        return App::default();
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal, file_name: &str, volume: u8) -> Result<()> {

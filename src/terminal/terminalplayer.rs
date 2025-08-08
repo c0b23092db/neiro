@@ -10,7 +10,7 @@ pub fn one_play(file_name:&str, volume:u8, timer:u64) -> Result<()> {
     sink.play();
     let (hours,minutes,seconds,millis) = player::format_duration(duration);
     print!("{} | {}:{:02}:{:02}:{:03} | ",
-                file_path.file_name().unwrap().to_string_lossy().into_owned(),
+                file_path.file_name()?.to_string_lossy().into_owned(),
                 hours, minutes, seconds, millis);
     if timer == 0 || duration.as_secs() < timer {
         println!("{}:{:02}:{:02}:{:03}",hours,minutes,seconds,millis);
