@@ -1,5 +1,5 @@
 use crate::core::track::TrackInfo;
-use crate::interactive::interactiveplayer::InteractivePlayer;
+use crate::core::audio::AudioPlayer;
 use ratatui::{
     style::{palette::tailwind, Stylize},
     text::{Line},
@@ -19,7 +19,7 @@ s : オーディオファイルの取り出し
 ↑ / ↓ / Shift + ↑ / Shift + ↓ : 音量の調整
 ? : 操作方法の表示/非表示";
 
-pub fn draw(frame: &mut Frame, player: &InteractivePlayer, track: &TrackInfo, cover: Option<&mut StatefulProtocol>, show_help: bool) {
+pub fn draw(frame: &mut Frame, player: &AudioPlayer, track: &TrackInfo, cover: Option<&mut StatefulProtocol>, show_help: bool) {
     let layout = Layout::default()
         .direction(Direction::Vertical)
         .constraints(vec![
@@ -49,7 +49,8 @@ pub fn draw(frame: &mut Frame, player: &InteractivePlayer, track: &TrackInfo, co
         draw_track(frame, layout[1], track, cover);
     }
     // 再生バー //
-    let progress_percentage = ((player.duration_current_time.as_millis() as f64 / player.duration_total_time.as_millis() as f64) * 100.0) as u16;
+    // 長さが取得できない曲や、位置が長さをわずかに超えた場合でも 0 ~ 100 に収める
+    let progress_percentage = (((player.duration_current_time.as_millis() as f64 / player.duration_total_time.as_millis() as f64) * 100.0) as u16).min(100);
     let progress_gauge = Gauge::default()
         .label(format!("{}:{:02}:{:02}:{:03} / {}:{:02}:{:02}:{:03}",
                         player.current_time.0,player.current_time.1,player.current_time.2,player.current_time.3,
@@ -65,7 +66,7 @@ pub fn draw(frame: &mut Frame, player: &InteractivePlayer, track: &TrackInfo, co
     let volume_gauge = Gauge::default()
         .block(Block::bordered().title("音量").title_bottom(Line::from("? : 操作方法").right_aligned()))
         .label(format!("{}%", player.volume))
-        .gauge_style(tailwind::GREEN.c500).percent(player.volume as u16);
+        .gauge_style(tailwind::GREEN.c500).percent(player.volume.min(100) as u16); // 100%を超える音量はバーを満杯で表示
     frame.render_widget(volume_gauge, layout[4]);
 }
 
