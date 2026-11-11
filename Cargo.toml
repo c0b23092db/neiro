@@ -22,11 +22,18 @@ strip = "symbols"
 # エラー処理
 anyhow = "1.0"
 # 並列処理
-smol = "2.0.2"
+smol = "2.0"
 # 引数
-clap = { version = "4.5.41", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 # 音声処理
-rodio = "0.21.1"
+rodio = "0.23.0"
 # TUI
 crossterm = "0.29.0"
-ratatui = "0.29.0"
+ratatui = "0.30"
+ratatui-image = { version = "11.1", default-features = false, features = ["crossterm"] }
+lofty = "0.25"
+image = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+ctrlc = { version = "3.5.2", features = ["termination"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+mpris-server = "0.11"

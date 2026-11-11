@@ -40,17 +40,19 @@ Arguments:
 Options:
   -t, --timer <TIMER>    Timer of Audio file (0 for full playback) [default: 0]
   -v, --volume <VOLUME>  Volume of Audio file [0-100] [default: 50]
-  -i, --interactive      Run in Interactive mode with UI controls
+      --tui              Run in TUI mode with UI controls (default)
+  -c, --cli              Run in CLI mode without UI
   -h, --help             Print help (see more with '--help')
   -V, --version          Print version
 ```
 
-### Synchronous Playback Mode
+### Synchronous Playback Mode (CLI mode)
 ```batch
-> sap.exe audio.mp3
+> sap.exe --cli audio.mp3
 .\audio.mp3 | 2:42 | 2:42
 ```
 This is the command-line execution mode.
+Even without `--cli`, this mode is used when the output is not a terminal (pipes, redirects, etc.).
 Use `Ctrl + C` to stop playback.
 Optional arguments like `-v` or `-h` can be added as needed.
 
@@ -58,33 +60,40 @@ Optional arguments like `-v` or `-h` can be added as needed.
   Specify the playback duration of the audio file.
   **Use 0 to play the entire file.**
 ```batch
-> sap.exe audio.mp3 -t 10
+> sap.exe --cli audio.mp3 -t 10
 .\audio.mp3 | 2:42 | 0:10
 ```
 
 - Volume (Optional)
   Specify the audio volume.
 ```batch
-> sap.exe audio.mp3 -t 5 -v 10
+> sap.exe --cli audio.mp3 -t 5 -v 10
 .\audio.mp3 | 2:42 | 0:05
 ```
 
-### Interactive Mode
+### Interactive Mode (TUI mode)
 ```batch
-sap -i audio.mp3
+sap audio.mp3
 ```
-This mode provides TUI-based playback controls.
-Only the volume option is accepted in this mode.
+This mode provides TUI-based playback controls. It is the default mode.
+
+If the audio file contains cover art, it is displayed in the center.
+If none is embedded, `cover` / `folder` / `front` / `album` (jpg, png, webp) in the same folder is used.
+
+- Timer (Optional)
+  Specify the playback duration of the audio file.
 
 - Volume (Optional)
   Specify the audio volume.
 ```batch
-> sap.exe -i audio.mp3 -v 10
+> sap.exe audio.mp3 -v 10
 ```
 
 #### Controls:
 - Esc / q / Ctrl + c
   Exit
+- ?
+  Show / hide the controls
 - Space
   Resume / Pause
 - r
@@ -95,6 +104,10 @@ Only the volume option is accepted in this mode.
   Volume adjustment. Hold Shift for larger changes.
 - ← →
   Seek position adjustment. Hold Shift for larger changes.
+
+### Media Controls (Linux)
+On Linux, the player is registered with MPRIS during playback.
+Desktop shells (such as Noctalia) and `playerctl` can read the title and cover art, and control play / pause, seek, volume and stop.
 
 ### ~~Asynchronous Playback Mode~~
 This feature is **not yet implemented**.

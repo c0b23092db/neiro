@@ -1,14 +1,14 @@
 use crate::core::player;
 use std::time::Duration;
 use std::path::Path;
-use rodio::{OutputStream, Sink};
+use rodio::{MixerDeviceSink, Player};
 use anyhow::{Result, anyhow};
 use smol::channel::{unbounded, Receiver, Sender};
 use std::sync::{Arc, Mutex};
 
 pub struct InteractivePlayer {
-    pub sink: Sink,
-    _stream_handle: OutputStream,
+    pub sink: Player,
+    _stream_handle: MixerDeviceSink,
     pub file_path: String,
     pub file_name: String,
     pub volume: u8,
@@ -92,6 +92,13 @@ impl InteractivePlayer {
     pub fn jump_seek(&self, secs:u64) -> Result<()> {
         self.sink.try_seek(Duration::from_secs(secs))
             .map_err(|e| anyhow!("Failed to jump_seek() used seek in rodio: {}", e))?;
+        Ok(())
+    }
+
+    /// 指定した位置に移動する（曲の長さを超える場合は末尾に丸める）
+    pub fn seek_to(&self, position:Duration) -> Result<()> {
+        self.sink.try_seek(position.min(self.duration_total_time))
+            .map_err(|e| anyhow!("Failed to seek_to() used seek in rodio: {}", e))?;
         Ok(())
     }
 

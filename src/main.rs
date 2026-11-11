@@ -1,6 +1,7 @@
 mod core;
 mod terminal;
 mod interactive;
+use std::io::IsTerminal;
 use std::process::ExitCode;
 use clap::Parser;
 
@@ -31,17 +32,28 @@ struct Cli {
     )]
     volume:u8,
     #[clap(
-        help = "Run in Interactive mode with UI controls",
-        long = "interactive",
-        short = 'i',
+        help = "Run in TUI mode with UI controls (default)",
+        long = "tui",
+        alias = "interactive",
+        short_alias = 'i',
+        conflicts_with = "mode_cli",
     )]
-    mode_interactive:bool,
+    mode_tui:bool,
+    #[clap(
+        help = "Run in CLI mode without UI",
+        long = "cli",
+        short = 'c',
+    )]
+    mode_cli:bool,
 }
 
 fn main() -> ExitCode {
     let args = Cli::parse();
     match
-        if args.mode_interactive { interactive::run::run_interactive_player(&args.file_name, args.volume) }
+        // 標準はTUIモード。パイプやリダイレクトなど端末でない場合はCLIモードで再生する
+        if args.mode_tui || (!args.mode_cli && std::io::stdout().is_terminal()) {
+            interactive::run::run_interactive_player(&args.file_name, args.volume, args.timer)
+        }
         else { terminal::terminalplayer::one_play(&args.file_name, args.volume, args.timer) }
     {
         Ok(_) => ExitCode::SUCCESS,

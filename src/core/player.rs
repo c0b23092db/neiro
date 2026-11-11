@@ -1,5 +1,5 @@
 use std::{fs::File,path::Path,time::Duration};
-use rodio::{Decoder, OutputStream, OutputStreamBuilder, Sink, Source};
+use rodio::{Decoder, MixerDeviceSink, DeviceSinkBuilder, Player, Source};
 use anyhow::{Context,Result,anyhow,bail};
 
 pub fn check_and_get_path(file_path:&str) -> Result<&Path> {
@@ -10,21 +10,21 @@ pub fn check_and_get_path(file_path:&str) -> Result<&Path> {
     Ok(path)
 }
 
-pub fn initialize_soundplayer() -> Result<(OutputStream,Sink)> {
-    let mut stream_handle = OutputStreamBuilder::open_default_stream()
-        .map_err(|e| anyhow!("Failed to initialize OutputStream in rodio：{}",e))?;
+pub fn initialize_soundplayer() -> Result<(MixerDeviceSink,Player)> {
+    let mut stream_handle = DeviceSinkBuilder::open_default_sink()
+        .map_err(|e| anyhow!("Failed to initialize MixerDeviceSink in rodio：{}",e))?;
     stream_handle.log_on_drop(false);
-    let sink = Sink::connect_new(&stream_handle.mixer());
+    let sink = Player::connect_new(&stream_handle.mixer());
     Ok((stream_handle,sink))
 }
 
 /// ## Description
-/// Sinkに音声ファイルを追加
+/// Playerに音声ファイルを追加
 /// ## Arguments
-/// sink:Sinkのインスタンス, path:音声ファイルのパス
+/// sink:Playerのインスタンス, path:音声ファイルのパス
 /// ## Returns
 /// hours:時間,minutes:分,seconds:秒,millis:ミリ秒
-pub fn append_one_track(sink:&Sink,path:&Path) -> Result<Duration> {
+pub fn append_one_track(sink:&Player,path:&Path) -> Result<Duration> {
     let file_data = File::open(path)
         .with_context(|| format!("Failed to open file：{}", path.display()))?;
     let decoder = Decoder::try_from(file_data)
