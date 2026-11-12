@@ -6,6 +6,7 @@ use lofty::picture::PictureType;
 pub struct Cover {
     pub data: Vec<u8>,
     /// 拡張子（jpg / png など）
+    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
     pub ext: String,
 }
 

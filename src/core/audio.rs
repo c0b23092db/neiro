@@ -17,8 +17,12 @@ pub struct AudioPlayer {
     pub total_time: (u64, u64, u64, u32),
     pub duration_current_time: Duration,
     pub current_time: (u64, u64, u64, u32),
+    /// 曲が終わったら最初から再生し直すか
+    pub repeat: bool,
     /// 前回の playback_state() から再生位置が飛んだか
     seeked: bool,
+    /// 利用者の操作で停止したか（リピートで再開しないための目印）
+    stopped: bool,
 }
 
 impl Drop for AudioPlayer {
@@ -40,7 +44,9 @@ impl AudioPlayer {
             total_time: format_duration(Duration::ZERO),
             duration_current_time: Duration::ZERO,
             current_time: format_duration(Duration::ZERO),
+            repeat: false,
             seeked: false,
+            stopped: false,
         })
     }
 
@@ -70,22 +76,36 @@ impl AudioPlayer {
     pub fn switch_playback(&self) -> bool {
         if self.player.is_paused() {
             self.resume();
-            return true;
+            true
         } else {
             self.pause();
-            return false;
+            false
         }
     }
 
-    pub fn stop(&self) {
+    pub fn stop(&mut self) {
+        self.stopped = true;
         self.player.stop();
+    }
+
+    /// リピートが有効で曲が最後まで再生されていたら、最初から再生し直す
+    /// ## Returns
+    /// 再生し直した場合は true
+    pub fn restart_if_finished(&mut self) -> Result<bool> {
+        if !self.repeat || self.stopped || !self.player.empty() {
+            return Ok(false);
+        }
+        append_one_track(&self.player, Path::new(&self.file_path))?;
+        self.get_current_position();
+        self.seeked = true;
+        Ok(true)
     }
 
     pub fn jump_seek(&mut self, secs:u64) -> Result<()> {
         self.seek_to(Duration::from_secs(secs))
     }
 
-    pub fn skep_seek(&mut self, secs:i64) -> Result<()> {
+    pub fn skip_seek(&mut self, secs:i64) -> Result<()> {
         self.seek_by(Duration::from_secs(secs.unsigned_abs()), secs.is_negative())
     }
 
@@ -123,11 +143,11 @@ impl AudioPlayer {
     }
 
     pub fn is_playing(&self) -> bool {
-        return !self.player.is_paused();
+        !self.player.is_paused()
     }
 
     pub fn is_empty(&self) -> bool {
-        return self.player.empty();
+        self.player.empty()
     }
 
     /// メディアコントロール（MPRISなど）からの操作を反映する
@@ -141,6 +161,7 @@ impl AudioPlayer {
             Command::Stop | Command::Quit => self.stop(),
             Command::SeekBy(micros) => _ = self.seek_by(Duration::from_micros(micros.unsigned_abs()), micros.is_negative()),
             Command::SeekTo(position) => _ = self.seek_to(position),
+            Command::SetRepeat(repeat) => self.repeat = repeat,
             Command::SetVolume(volume) => self.set_volume((volume.clamp(0.0, MAX_VOLUME as f64 / 100.0) * 100.0).round() as u8),
         }
     }
@@ -152,6 +173,7 @@ impl AudioPlayer {
             stopped: self.is_empty(),
             position: self.duration_current_time,
             volume: self.volume,
+            repeat: self.repeat,
             seeked: std::mem::take(&mut self.seeked),
         }
     }
@@ -169,7 +191,7 @@ fn initialize_soundplayer() -> Result<(MixerDeviceSink,Player)> {
     let mut stream_handle = DeviceSinkBuilder::open_default_sink()
         .map_err(|e| anyhow!("Failed to initialize MixerDeviceSink in rodio：{}",e))?;
     stream_handle.log_on_drop(false);
-    let player = Player::connect_new(&stream_handle.mixer());
+    let player = Player::connect_new(stream_handle.mixer());
     Ok((stream_handle,player))
 }
 
@@ -196,5 +218,5 @@ pub fn format_duration(duration:Duration) -> (u64,u64,u64,u32) {
     let minutes = duration.as_secs() / 60 % 60;
     let seconds = duration.as_secs() % 60;
     let millis = duration.subsec_millis();
-    return (hours,minutes,seconds,millis);
+    (hours,minutes,seconds,millis)
 }

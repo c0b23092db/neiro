@@ -18,14 +18,17 @@ pub enum Command {
     SeekTo(Duration),
     /// 音量 (1.0 = 100%)
     SetVolume(f64),
+    SetRepeat(bool),
 }
 
 /// 外部に公開する再生状態
+#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
 pub struct PlaybackState {
     pub playing: bool,
     pub stopped: bool,
     pub position: Duration,
     pub volume: u8,
+    pub repeat: bool,
     /// 前回の同期から再生位置が飛んだか
     pub seeked: bool,
 }
@@ -37,7 +40,7 @@ mod imp {
     use super::{Command, PlaybackState};
     use crate::core::track::{Cover, TrackInfo};
     use std::{env, fs, path::{Path, PathBuf}, process, time::Duration};
-    use mpris_server::{Metadata, PlaybackStatus, Player, Time, TrackId};
+    use mpris_server::{LoopStatus, Metadata, PlaybackStatus, Player, Time, TrackId};
     use smol::{channel::{unbounded, Receiver}, LocalExecutor};
 
     pub struct MediaControl {
@@ -104,6 +107,9 @@ mod imp {
                 player.connect_set_position({ let send = send.clone(); move |_, _, position| {
                     send(Command::SeekTo(Duration::from_micros(position.as_micros().max(0) as u64)))
                 }});
+                player.connect_set_loop_status({ let send = send.clone(); move |_, loop_status| {
+                    send(Command::SetRepeat(loop_status != LoopStatus::None))
+                }});
                 player.connect_set_volume(move |_, volume| send(Command::SetVolume(volume)));
                 executor.spawn(player.run()).detach();
             }
@@ -130,6 +136,10 @@ mod imp {
             let volume = state.volume as f64 / 100.0;
             if (player.volume() - volume).abs() > f64::EPSILON {
                 _ = player.set_volume(volume).await;
+            }
+            let loop_status = if state.repeat { LoopStatus::Track } else { LoopStatus::None };
+            if player.loop_status() != loop_status {
+                _ = player.set_loop_status(loop_status).await;
             }
             if state.seeked {
                 _ = player.seeked(position).await;

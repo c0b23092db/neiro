@@ -16,6 +16,7 @@ sap.exe
 
 ## 💻Runtime Environment💻
 - [x] Windows 11
+- [x] Linux
 
 ## ⬇Installation⬇
 
@@ -40,8 +41,10 @@ Arguments:
 Options:
   -t, --timer <TIMER>    Timer of Audio file (0 for full playback) [default: 0]
   -v, --volume <VOLUME>  Volume of Audio file [0-100] [default: 50]
+  -r, --repeat           Repeat the Audio file
       --tui              Run in TUI mode with UI controls (default)
   -c, --cli              Run in CLI mode without UI
+  -a, --async            Play in the background and return immediately
   -h, --help             Print help (see more with '--help')
   -V, --version          Print version
 ```
@@ -98,6 +101,8 @@ If none is embedded, `cover` / `folder` / `front` / `album` (jpg, png, webp) in 
   Resume / Pause
 - r
   Replay
+- l
+  Toggle repeat
 - s
   Extract audio file
 - ↑ ↓
@@ -109,19 +114,25 @@ If none is embedded, `cover` / `folder` / `front` / `album` (jpg, png, webp) in 
 On Linux, the player is registered with MPRIS during playback.
 Desktop shells (such as Noctalia) and `playerctl` can read the title and cover art, and control play / pause, seek, volume and stop.
 
-### ~~Asynchronous Playback Mode~~
-This feature is **not yet implemented**.
+### Asynchronous Playback Mode
 ```batch
 sap -a audio.mp3
 sap pause
 sap resume
 sap stop
 ```
+Plays in the background and the command returns immediately.
+
+`-t` (Timer), `-v` (Volume) and `-r` (Repeat) are accepted.
+
+`sap pause` / `sap resume` / `sap stop` control every running Neiro, including those playing in TUI mode or CLI mode.
+
+**`pause` / `resume` / `stop` are supported on Linux only.** (They use MPRIS.)
 
 ## Implementation Roadmap
 - [x] Synchronous playback mode
 - [x] Interactive mode
-- [ ] Asynchronous playback mode
+- [x] Asynchronous playback mode
 
 ## 🔍Developer🔎
 - いかた゚ : [](url)

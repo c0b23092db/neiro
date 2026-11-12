@@ -1,6 +1,6 @@
 [package]
 name = "Neiro"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2024"
 description = "Simple Audio File Player in Terminal"
 categories = ["command-line-utilities","multimedia::audio"]
@@ -11,6 +11,14 @@ repository = "https://github.com/c0b23092db/neiro"
 [[bin]]
 name = "sap"
 path = "src/main.rs"
+
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/neiro-{ target }{ archive-suffix }"
+bin-dir = "{ bin }{ binary-ext }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"
 
 [profile.release]
 lto = "fat"

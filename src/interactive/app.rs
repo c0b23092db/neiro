@@ -22,9 +22,10 @@ pub struct App {
 
 impl App {
     /// オーディオファイルを読み込み、再生を開始する
-    pub fn new(file_name: &str, volume: u8) -> Result<Self> {
+    pub fn new(file_name: &str, volume: u8, repeat: bool) -> Result<Self> {
         let mut player = AudioPlayer::new()?;
         player.set_volume(volume);
+        player.repeat = repeat;
         player.insert_and_play(file_name)?;
         Ok(Self {
             player,
@@ -48,9 +49,7 @@ impl App {
             ).await;
             while !self.exit {
                 self.player.get_current_position();
-                if let Err(e) = self.handle_events_async().await {
-                    return Err(e);
-                }
+                self.handle_events_async().await?;
                 // メディアコントロール（MPRISなど）からの操作 //
                 while let Some(command) = media.poll_command() {
                     match command {
@@ -61,7 +60,7 @@ impl App {
                 terminal.draw(|frame| draw(frame, &self.player, &self.track, self.cover.as_mut(), self.show_help))?;
                 media.sync(&self.player.playback_state()).await;
                 smol::Timer::after(self.framerate).await;
-                if self.player.is_empty() && self.player.is_playing() {
+                if self.player.is_empty() && !self.player.restart_if_finished()? && self.player.is_playing() {
                     self.exit = true;
                 }
                 // 再生時間の指定がある場合はそこで終了する
@@ -107,13 +106,15 @@ impl App {
             (modifier, key @ (KeyCode::Left | KeyCode::Right)) => {
                 let mut secs = if modifier == KeyModifiers::SHIFT { 10 } else { 5 };
                 secs *= if matches!(key, KeyCode::Right) { 1 } else { -1 };
-                self.player.skep_seek(secs)?
+                self.player.skip_seek(secs)?
             },
             // 参考コード // 5,10秒進む //
-            // (KeyModifiers::SHIFT, KeyCode::Right) => self.skep_seek(10)?,
-            // (_, KeyCode::Right) => self.skep_seek(5)?,
+            // (KeyModifiers::SHIFT, KeyCode::Right) => self.skip_seek(10)?,
+            // (_, KeyCode::Right) => self.skip_seek(5)?,
             // リプレイ //
             (_, KeyCode::Char('r')) => self.player.jump_seek(u64::MIN)?,
+            // リピートの切り替え //
+            (_, KeyCode::Char('l')) => self.player.repeat = !self.player.repeat,
             // 取り出し //
             (_, KeyCode::Char('s')) => self.player.stop(),
             _ => {}

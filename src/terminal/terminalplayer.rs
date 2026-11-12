@@ -6,9 +6,10 @@ use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
 use std::time::Duration;
 use anyhow::Result;
 
-pub fn one_play(file_name:&str, volume:u8, timer:u64) -> Result<()> {
+pub fn one_play(file_name:&str, volume:u8, timer:u64, repeat:bool) -> Result<()> {
     let mut player = AudioPlayer::new()?;
     player.set_volume(volume);
+    player.repeat = repeat;
     player.insert_and_play(file_name)?;
     let duration = player.duration_total_time;
     let (hours,minutes,seconds,millis) = player.total_time;
@@ -34,7 +35,11 @@ pub fn one_play(file_name:&str, volume:u8, timer:u64) -> Result<()> {
     let executor = smol::LocalExecutor::new();
     smol::block_on(executor.run(async {
         let mut media = MediaControl::connect(&executor, &track, &player.file_path, &player.file_name, duration).await;
-        while !interrupted.load(Ordering::Relaxed) && !player.is_empty() {
+        while !interrupted.load(Ordering::Relaxed) {
+            // 曲が終わったら終了する（リピート中は最初から再生し直す）
+            if player.is_empty() && !player.restart_if_finished()? {
+                break;
+            }
             player.get_current_position();
             if limit.is_some_and(|limit| player.duration_current_time >= limit) {
                 break;
@@ -45,6 +50,6 @@ pub fn one_play(file_name:&str, volume:u8, timer:u64) -> Result<()> {
             media.sync(&player.playback_state()).await;
             smol::Timer::after(Duration::from_millis(50)).await;
         }
-    }));
-    Ok(())
+        Ok(())
+    }))
 }

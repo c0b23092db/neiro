@@ -14,6 +14,7 @@ const HELP: &str = "~ 操作方法 ~
 Esc / q / Ctrl + c : 終了
 Space : 再生/一時停止
 r : リプレイ
+l : リピートの切り替え
 s : オーディオファイルの取り出し
 ← / → / Shift + ← / Shift + → : 再生位置の調整
 ↑ / ↓ / Shift + ↑ / Shift + ↓ : 音量の調整
@@ -59,7 +60,10 @@ pub fn draw(frame: &mut Frame, player: &AudioPlayer, track: &TrackInfo, cover: O
         .gauge_style(tailwind::BLUE.c500).percent(progress_percentage);
     frame.render_widget(progress_gauge, layout[2]);
     // 再生ボタン //
-    let play_button = Line::from(if player.is_playing() { "▶ Resume ▶" } else { "- Pause -" })
+    let play_button = Line::from(format!("{}{}",
+            if player.is_playing() { "▶ Resume ▶" } else { "- Pause -" },
+            if player.repeat { " [Repeat]" } else { "" },
+        ))
         .centered();
     frame.render_widget(play_button, layout[3]);
     // 音量バー //
