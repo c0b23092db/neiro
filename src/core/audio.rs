@@ -2,8 +2,6 @@ use crate::core::mediacontrol::{Command, PlaybackState};
 use std::{fs::File,path::Path,time::Duration};
 use rodio::{Decoder, DeviceSinkBuilder, MixerDeviceSink, Player, Source};
 use anyhow::{Context,Result,anyhow,bail};
-
-/// 指定できる音量の上限（%）
 pub const MAX_VOLUME: u8 = 200;
 
 /// TUIモード・CLIモードで共通のオーディオプレイヤー
@@ -17,11 +15,8 @@ pub struct AudioPlayer {
     pub total_time: (u64, u64, u64, u32),
     pub duration_current_time: Duration,
     pub current_time: (u64, u64, u64, u32),
-    /// 曲が終わったら最初から再生し直すか
     pub repeat: bool,
-    /// 前回の playback_state() から再生位置が飛んだか
     seeked: bool,
-    /// 利用者の操作で停止したか（リピートで再開しないための目印）
     stopped: bool,
 }
 
