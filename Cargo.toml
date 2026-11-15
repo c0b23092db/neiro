@@ -1,6 +1,6 @@
 [package]
 name = "Neiro"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2024"
 description = "Simple Audio File Player in Terminal"
 categories = ["command-line-utilities","multimedia::audio"]
