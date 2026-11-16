@@ -1,14 +1,14 @@
-# <span style="color:#A0ffff">Neiro / Simple Audio File Player</span>
-
+# Neiro / Simple Audio File Player
+**ドキュメント未整備**
 This README-en.md was translated from README.md by Claude Sonnet 4.
 
-[日本語](../README.md)・[English](README-en.md)
+[日本語](../README.md) / [English](./README-en.md)
 ```batch
-sap.exe
+sap
 ```
-(*'▽')＜ A simple audio player that runs in the terminal.
+A simple audio player that runs in the terminal.
 
-![Demo Movie](../document/demo/sap_demo_movie.gif)
+![Demo Movie](./demo.gif)
 
 ## ❄Overview❄
 - A simple audio player that runs in the terminal
@@ -49,31 +49,6 @@ Options:
   -V, --version          Print version
 ```
 
-### Synchronous Playback Mode (CLI mode)
-```batch
-> sap.exe --cli audio.mp3
-.\audio.mp3 | 2:42 | 2:42
-```
-This is the command-line execution mode.
-Even without `--cli`, this mode is used when the output is not a terminal (pipes, redirects, etc.).
-Use `Ctrl + C` to stop playback.
-Optional arguments like `-v` or `-h` can be added as needed.
-
-- Timer (Optional)
-  Specify the playback duration of the audio file.
-  **Use 0 to play the entire file.**
-```batch
-> sap.exe --cli audio.mp3 -t 10
-.\audio.mp3 | 2:42 | 0:10
-```
-
-- Volume (Optional)
-  Specify the audio volume.
-```batch
-> sap.exe --cli audio.mp3 -t 5 -v 10
-.\audio.mp3 | 2:42 | 0:05
-```
-
 ### Interactive Mode (TUI mode)
 ```batch
 sap audio.mp3
@@ -110,9 +85,30 @@ If none is embedded, `cover` / `folder` / `front` / `album` (jpg, png, webp) in 
 - ← →
   Seek position adjustment. Hold Shift for larger changes.
 
-### Media Controls (Linux)
-On Linux, the player is registered with MPRIS during playback.
-Desktop shells (such as Noctalia) and `playerctl` can read the title and cover art, and control play / pause, seek, volume and stop.
+### Synchronous Playback Mode (CLI mode)
+```batch
+> sap.exe --cli audio.mp3
+.\audio.mp3 | 2:42 | 2:42
+```
+This is the command-line execution mode.
+Even without `--cli`, this mode is used when the output is not a terminal (pipes, redirects, etc.).
+Use `Ctrl + C` to stop playback.
+Optional arguments like `-v` or `-h` can be added as needed.
+
+- Timer (Optional)
+  Specify the playback duration of the audio file.
+  **Use 0 to play the entire file.**
+```batch
+> sap.exe --cli audio.mp3 -t 10
+.\audio.mp3 | 2:42 | 0:10
+```
+
+- Volume (Optional)
+  Specify the audio volume.
+```batch
+> sap.exe --cli audio.mp3 -t 5 -v 10
+.\audio.mp3 | 2:42 | 0:05
+```
 
 ### Asynchronous Playback Mode
 ```batch
@@ -129,13 +125,9 @@ Plays in the background and the command returns immediately.
 
 **`pause` / `resume` / `stop` are supported on Linux only.** (They use MPRIS.)
 
-## Implementation Roadmap
-- [x] Synchronous playback mode
-- [x] Interactive mode
-- [x] Asynchronous playback mode
-
-## 🔍Developer🔎
-- いかた゚ : [](url)
+### Media Controls (Linux)
+On Linux, the player is registered with MPRIS during playback.
+Desktop shells (such as Noctalia) and `playerctl` can read the title and cover art, and control play / pause, seek, volume and stop.
 
 ## ♪Audio Sources Used in Development♪
 - [Amethyst break1](https://minecraft.fandom.com/wiki/Category:Amethyst_sounds)

@@ -1,6 +1,6 @@
 # Neiro（ねゐろ）
 [日本語](./README.md) / [English](./README/README-en.md)
-```batch
+```bash
 sap
 ```
 ターミナル上で動作するシンプルなオーディオプレイヤー
